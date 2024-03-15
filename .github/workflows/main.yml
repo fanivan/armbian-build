@@ -26,7 +26,7 @@ jobs:
       UBOOT_MIRROR: "github"
       KERNEL_CONFIGURE: "yes"
       CLEAN_LEVEL: ""
-      OUTPUT_PATH: "/github/workspace/output"
+      OUTPUT_PATH: "/.github/output"
 
     steps:
       - name: Checkout Repository
