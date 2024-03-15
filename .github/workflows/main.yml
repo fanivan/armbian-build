@@ -26,7 +26,6 @@ jobs:
       UBOOT_MIRROR: "github"
       KERNEL_CONFIGURE: "yes"
       CLEAN_LEVEL: ""
-      OUTPUT_PATH: "/.github/output"
 
     steps:
       - name: Checkout Repository
@@ -56,6 +55,3 @@ jobs:
 
       - name: Archive Artifacts
         uses: actions/upload-artifact@v2
-        with:
-          name: armbian-output
-          path: ${{ env.OUTPUT_PATH }}
