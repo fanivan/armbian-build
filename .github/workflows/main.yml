@@ -1,0 +1,61 @@
+name: z96a-rk3568-laptop
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build Armbian
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-20.04, ubuntu-latest]
+        desktop_environment: ['xfce', 'gnome']
+        release: ['jammy', 'hirsute']
+
+    env:
+      PREFER_DOCKER: "no"
+      BOARD: "z96a-rk3568-laptop"
+      BRANCH: "legacy"
+      BUILD_MINIMAL: "no"
+      DESKTOP_APPGROUPS_SELECTED: ""
+      MAINLINE_MIRROR: "google"
+      UBOOT_MIRROR: "github"
+      KERNEL_CONFIGURE: "yes"
+      CLEAN_LEVEL: ""
+      OUTPUT_PATH: "/github/workspace/output"
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential crossbuild-essential-arm64 bash-completion vim sudo locales time rsync bc
+          sudo apt-get install -y repo git ssh libssl-dev liblz4-tool lib32stdc++6 expect patchelf chrpath gawk texinfo diffstat binfmt-support qemu-user-static live-build bison flex fakeroot cmake unzip device-tree-compiler python3-pip libncurses-dev python3-pyelftools subversion asciidoc w3m dblatex graphviz cpio libparse-yapp-perl default-jre patchutils swig u-boot-tools
+
+      - name: Compile Armbian
+        run: |
+          bash compile.sh build \
+            PREFER_DOCKER="$PREFER_DOCKER" \
+            BOARD="$BOARD" \
+            BRANCH="$BRANCH" \
+            RELEASE="${{ matrix.release }}" \
+            BUILD_DESKTOP="yes" \
+            BUILD_MINIMAL="$BUILD_MINIMAL" \
+            DESKTOP_APPGROUPS_SELECTED="$DESKTOP_APPGROUPS_SELECTED" \
+            DESKTOP_ENVIRONMENT="${{ matrix.desktop_environment }}" \
+            MAINLINE_MIRROR="$MAINLINE_MIRROR" \
+            UBOOT_MIRROR="$UBOOT_MIRROR" \
+            KERNEL_CONFIGURE="$KERNEL_CONFIGURE" \
+            CLEAN_LEVEL="$CLEAN_LEVEL"
+
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: armbian-output
+          path: ${{ env.OUTPUT_PATH }}
