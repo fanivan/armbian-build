@@ -2,8 +2,7 @@ name: z96a-rk3568-laptop
 
 on:
   push:
-    branches:
-      - master
+    branches: [ main ]
 
 jobs:
   build:
